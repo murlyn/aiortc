@@ -8,6 +8,7 @@ from typing import Dict, List, Optional, Union
 from . import clock, rtp
 from .codecs import get_capabilities, get_encoder, is_rtx
 from .codecs.base import Encoder
+from .codecs.passthrough import PassThroughEncoder
 from .exceptions import InvalidStateError
 from .mediastreams import MediaStreamError, MediaStreamTrack
 from .rtcrtpparameters import RTCRtpCodecParameters, RTCRtpSendParameters
@@ -245,6 +246,11 @@ class RTCRtpSender:
     async def _next_encoded_frame(self, codec: RTCRtpCodecParameters):
         # get frame
         frame = await self.__track.recv()
+
+        if hasattr(self.__track, 'skip_encoding') and self.__track.skip_encoding:
+            return await self.__loop.run_in_executor(
+                None, PassThroughEncoder.encode, frame, self.__force_keyframe
+            )
 
         # encode frame
         if self.__encoder is None:
