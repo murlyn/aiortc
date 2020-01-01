@@ -6,11 +6,10 @@ import uuid
 from typing import Dict, List, Optional, Union
 
 from . import clock, rtp
-from .codecs import get_capabilities, get_encoder, is_rtx
+from .codecs import get_capabilities, get_encoder, is_rtx, PassThroughEncoder
 from .codecs.base import Encoder
-from .codecs.passthrough import PassThroughEncoder
 from .exceptions import InvalidStateError
-from .mediastreams import MediaStreamError, MediaStreamTrack
+from .mediastreams import MediaStreamError, MediaStreamTrack, VIDEO_TIME_BASE, convert_timebase
 from .rtcrtpparameters import RTCRtpCodecParameters, RTCRtpSendParameters
 from .rtp import (
     RTCP_PSFB_APP,
@@ -249,7 +248,7 @@ class RTCRtpSender:
 
         if hasattr(self.__track, 'skip_encoding') and self.__track.skip_encoding:
             return await self.__loop.run_in_executor(
-                None, PassThroughEncoder.encode, frame, self.__force_keyframe
+                None, PassThroughEncoder.encode, frame, convert_timebase(frame.pts, frame.time_base, VIDEO_TIME_BASE)
             )
 
         # encode frame

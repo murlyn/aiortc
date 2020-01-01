@@ -14,6 +14,7 @@ from .g711 import PcmaDecoder, PcmaEncoder, PcmuDecoder, PcmuEncoder
 from .h264 import H264Decoder, H264Encoder, h264_depayload
 from .opus import OpusDecoder, OpusEncoder
 from .vpx import Vp8Decoder, Vp8Encoder, vp8_depayload
+from .passthrough import PassThroughEncoder
 
 PCMU_CODEC = RTCRtpCodecParameters(
     mimeType="audio/PCMU", clockRate=8000, channels=1, payloadType=0
